@@ -1,3 +1,50 @@
+<script>
+export default {
+  name: "List",
+  props: {
+    data: { type: Array, default: () => [] },
+    options: { type: Object, default: () => ({ limit: 25, offset: 0 }) },
+  },
+  computed: {
+    // sort data by name
+    sortedData() {
+      return this.data.sort((a, b) => {
+        if (a.name < b.name) {
+          return -1;
+        } else if (a.name > b.name) {
+          return 1;
+        }
+        return 0;
+      });
+    },
+    // paginate data
+    paginatedData() {
+      return this.sortedData?.slice(
+        this.options.pagination?.offset,
+        this.options.pagination?.offset + this.options.pagination.limit
+      );
+    },
+    // list of pages to display
+    pages() {
+      return new Array(
+        Math.ceil(this.data.length / this.options.pagination.limit)
+      )
+        .fill()
+        .map((v, i) => i);
+    },
+    // currently displayed page
+    currentPage() {
+      return this.options.pagination.offset / this.options.pagination.limit;
+    },
+  },
+  methods: {
+    changePage(page) {
+      this.options.pagination.offset = page * this.options.pagination.limit;
+    },
+  },
+};
+</script>
+
 <template>
   <ul>
     <li v-for="item in paginatedData" :key="item._id">
@@ -30,52 +77,6 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "List",
-  props: {
-    data: { type: Array, default: () => [] },
-    options: { type: Object, default: () => ({ limit: 25, offset: 0 }) },
-  },
-  computed: {
-    // sort data by name
-    sortedData() {
-      return this.data.sort((a, b) => {
-        if (a.name < b.name) {
-          return -1;
-        } else if (a.name > b.name) {
-          return 1;
-        }
-        return 0;
-      });
-    },
-    // paginate data
-    paginatedData() {
-      return this.sortedData.slice(
-        this.options.pagination.offset,
-        this.options.pagination.offset + this.options.pagination.limit
-      );
-    },
-    // list of pages to display
-    pages() {
-      return new Array(
-        Math.ceil(this.data.length / this.options.pagination.limit)
-      )
-        .fill()
-        .map((v, i) => i);
-    },
-    // currently displayed page
-    currentPage() {
-      return this.options.pagination.offset / this.options.pagination.limit;
-    },
-  },
-  methods: {
-    changePage(page) {
-      this.options.pagination.offset = page * this.options.pagination.limit;
-    },
-  },
-};
-</script>
 
 <style scoped lang="scss">
 .pagination ul {
